@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
 from model_service.model_utils import load_model
+from flasgger import Swagger, swag_from
 import os
 # from lib_ml.preprocessing import preprocess_text
 
 app = Flask(__name__)
+swagger = Swagger(app)
 
 # Load the model when the application starts
 model = load_model()
@@ -13,6 +15,7 @@ HOST = os.environ.get("MODEL_SERVICE_HOST", "0.0.0.0")
 PORT = int(os.environ.get("MODEL_SERVICE_PORT", 5000))
 
 @app.route('/predict', methods=['POST'])
+@swag_from('docs/predict.yml')
 def predict():
     """
     Endpoint to make predictions using the loaded model.
@@ -28,7 +31,7 @@ def predict():
     # processed_text = preprocess_text(text)
     
     # Make prediction
-    prediction = model.predict([text])
+    prediction = model.predict([text])[0]
     
     return jsonify({"text": text, 'prediction': prediction})
 

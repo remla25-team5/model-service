@@ -1,0 +1,37 @@
+summary: Predict sentiment of restaurant review
+description: >
+  Returns the predicted sentiment of a restaurant review using the ML model.
+
+  A prediction of `1` indicates positive sentiment, and `0` indicates negative sentiment.
+consumes:
+  - application/json
+produces:
+  - application/json
+parameters:
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          example: "The food was delicious and the staff were friendly!"
+responses:
+  200:
+    description: Prediction result
+    schema:
+      type: object
+      properties:
+        text:
+          type: string
+          example: "The food was delicious and the staff were friendly!"
+        prediction:
+          type: integer
+          enum: [0, 1]
+          description: >
+            Sentiment prediction — 1 for positive, 0 for negative.
+  400:
+    description: Invalid input
