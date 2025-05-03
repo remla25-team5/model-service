@@ -9,7 +9,7 @@ app = Flask(__name__)
 swagger = Swagger(app)
 
 # Load the model when the application starts
-model = load_model()
+# model = load_model()
 
 # Get host and port from environment variables or use defaults
 HOST = os.environ.get("MODEL_SERVICE_HOST", "0.0.0.0")
