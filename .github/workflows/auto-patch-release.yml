@@ -40,3 +40,4 @@ jobs:
           git tag ${{ steps.bump.outputs.version }}
           git push origin HEAD
           git push origin ${{ steps.bump.outputs.version }}
+  
