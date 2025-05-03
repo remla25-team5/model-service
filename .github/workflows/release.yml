@@ -7,6 +7,9 @@ jobs:
   build:
     runs-on: ubuntu-24.04
 
+    permissions:
+      contents: write
+
     steps:
       - uses: actions/checkout@v4
 
@@ -44,4 +47,30 @@ jobs:
           docker push $IMG:${{ env.version_major }}.${{ env.version_minor }}.latest
           docker push $IMG:${{ env.version_major }}.latest
           docker push $IMG:latest
+
+
+      - name: Set release version and bump to pre-release in main branch
+        run: |
+          git fetch origin main
+          git worktree add ../main_worktree origin/main
+          cd ../main_worktree
+      
+          # Step 1: Set release version
+          echo "${{ env.version }}" > VERSION
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add VERSION
+          git commit -m "ci: release ${{ env.version }} — update VERSION"
+      
+          # Step 2: Bump to next -pre version
+          PATCH=${{ env.version_patch }}
+          NEXT_PATCH=$((PATCH + 1))
+          PRE_VERSION="v${{ env.version_major }}.${{ env.version_minor }}.${NEXT_PATCH}-pre"
+      
+          echo "$PRE_VERSION" > VERSION
+          git add VERSION
+          git commit -m "ci: bump to $PRE_VERSION after release ${{ env.version }}"
+      
+          # Push both commits to main
+          git push origin HEAD:main
         
