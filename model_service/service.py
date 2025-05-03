@@ -31,9 +31,9 @@ def predict():
     # processed_text = preprocess_text(text)
     
     # Make prediction
-    prediction = model.predict([text])[0]
+    sentiment = True if model.predict([text])[0] == 1 else False
     
-    return jsonify({"text": text, 'prediction': prediction})
+    return jsonify({"text": text, 'sentiment': sentiment})
 
 if __name__ == "__main__":
     app.run(host=HOST, port=PORT)

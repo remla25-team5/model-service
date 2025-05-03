@@ -29,9 +29,9 @@ responses:
           type: string
           example: "The food was delicious and the staff were friendly!"
         prediction:
-          type: integer
-          enum: [0, 1]
+          type: boolean
+          example: true
           description: >
-            Sentiment prediction — 1 for positive, 0 for negative.
+            Sentiment prediction — True for positive, False for negative.
   400:
     description: Invalid input
