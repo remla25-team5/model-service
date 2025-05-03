@@ -3,6 +3,7 @@ from model_service.model_utils import load_model
 from flasgger import Swagger, swag_from
 import os
 # from lib_ml.preprocessing import preprocess_text
+# from lib_ml import __version__ as lib_ml_version
 
 app = Flask(__name__)
 swagger = Swagger(app)
@@ -27,13 +28,27 @@ def predict():
     
     text = data['text']
     
-    # Preprocess the text
+    # TODO: Preprocess the text
     # processed_text = preprocess_text(text)
     
     # Make prediction
     sentiment = True if model.predict([text])[0] == 1 else False
     
     return jsonify({"text": text, 'sentiment': sentiment})
+
+
+@app.route('/version', methods=['GET'])
+@swag_from('docs/version.yml')
+def version():
+    """
+    Endpoint to get the version of the model from lib_ml.
+    """
+    # For now, we will return a hardcoded version
+    return jsonify({"version": "1.0.0"})
+
+    # TODO: Uncomment the following lines when lib_ml is available
+    # return jsonify({"version": lib_ml_version})
+    
 
 if __name__ == "__main__":
     app.run(host=HOST, port=PORT)

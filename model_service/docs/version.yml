@@ -1,0 +1,19 @@
+# docs/version.yml
+get:
+  summary: Get the version of the lib_ml model
+  description: Returns the current version of the model (from the lib_ml library).
+  tags:
+    - Version
+  responses:
+    200:
+      description: Version retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              version:
+                type: string
+                example: "1.0.0"
+    500:
+      description: Internal server error
