@@ -55,7 +55,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git commit -am "ci: release ${{ env.version }} — update VERSION"
-          git push
+          git push origin HEAD:main
 
       - name: Bump VERSION on main to next patch pre-release
         run: |
