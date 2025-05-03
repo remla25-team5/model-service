@@ -1,0 +1,6 @@
+flask
+requests
+joblib
+pathlib
+flasgger
+# git+https://github.com/REMLA25-Team5/lib-ml@v0.0.X
