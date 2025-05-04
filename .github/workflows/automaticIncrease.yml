@@ -1,7 +1,8 @@
-name: Release Model Service
+name: Automatic increase
 on:
   push:
-    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+    branches:
+      - main
 jobs:
   build:
     runs-on: ubuntu-24.04
@@ -12,46 +13,29 @@ jobs:
       id-token: write
     steps:
     - uses: actions/checkout@v4
+      with:
+        ref: main
+        fetch-depth: 0
     - uses: docker/login-action@v3
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ github.token }}
-    - name: Parse version info from tag
-      run: |
-        # GITHUB_REF is like refs/tags/v2.3.5, so strip the first 11 chars
-        VERSION=${GITHUB_REF:11}
-        MAJOR=$(echo "$VERSION" | cut -d . -f 1)
-        MINOR=$(echo "$VERSION" | cut -d . -f 2)
-        PATCH=$(echo "$VERSION" | cut -d . -f 3)
-        PATCH=$((PATCH + 1))
+    - run: |
+        latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+        MAJOR=$(echo "$latest_tag" | cut -d . -f 1)
+        MAJOR=${MAJOR#v}  # Remove the 'v' prefix
+        MINOR=$(echo "$latest_tag" | cut -d . -f 2)
+        PATCH=$(echo "$latest_tag" | cut -d . -f 3 | cut -d - -f 1)
         timestamp=$(date -u +"%Y%m%d.%H%M")
         pre_version="v${MAJOR}.${MINOR}.${PATCH}-pre-${timestamp}"
         echo "pre_version=$pre_version" >> $GITHUB_ENV
-        echo "version=$VERSION" >> $GITHUB_ENV
         echo "version_major=$MAJOR" >> $GITHUB_ENV
         echo "version_minor=$MINOR" >> $GITHUB_ENV
     - run: |
-        IMG="ghcr.io/${{github.repository}}"
-        IMG=${IMG@L} # lower case the image
-        docker build \
-        --tag $IMG:${{ env.version }} \
-        --tag $IMG:${{ env.version_major }}.${{ env.version_minor }}.latest \
-        --tag $IMG:${{ env.version_major }}.latest \
-        --tag $IMG:latest \
-        ./app-service
-        docker push --all-tags $IMG
-    - uses: actions/checkout@v4
-      with:
-        ref: main
-        fetch-depth: 0
-        path: main-branch
-    - working-directory: ./main-branch
-      run: |
         git tag "${{ env.pre_version }}"
         git push origin "${{ env.pre_version }}"
-    - working-directory: ./main-branch
-      run: |
+    - run: |
         IMG="ghcr.io/${{github.repository}}"
         IMG=${IMG@L} # lower case the image
         docker build \
