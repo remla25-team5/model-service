@@ -35,6 +35,7 @@ jobs:
         IMG="ghcr.io/${{github.repository}}"
         IMG=${IMG@L} # lower case the image
         docker build \
+        --file Dockerfile \
         --tag $IMG:${{ env.version }} \
         --tag $IMG:${{ env.version_major }}.${{ env.version_minor }}.latest \
         --tag $IMG:${{ env.version_major }}.latest \
@@ -55,9 +56,10 @@ jobs:
         IMG="ghcr.io/${{github.repository}}"
         IMG=${IMG@L} # lower case the image
         docker build \
+        --file ../Dockerfile \
         --tag $IMG:${{ env.pre_version }} \
         --tag $IMG:${{ env.version_major }}.${{ env.version_minor }}.latest \
         --tag $IMG:${{ env.version_major }}.latest \
         --tag $IMG:latest \
-        .
+        ..
         docker push --all-tags $IMG
