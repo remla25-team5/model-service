@@ -4,8 +4,21 @@ import joblib
 from pathlib import Path
 
 # Get model cache directory from environment variable or use default
-MODEL_CACHE_DIR = os.environ.get("MODEL_CACHE_DIR", "/app/model-cache")
+# Use local directory paths when running locally
+BASE_DIR = Path(__file__).resolve().parent.parent
+MODEL_CACHE_DIR = os.environ.get("MODEL_CACHE_DIR", os.path.join(BASE_DIR, "model-cache"))
+CV_CACHE_DIR = os.environ.get("CV_CACHE_DIR", os.path.join(BASE_DIR, "cv-cache"))
 MODEL_VERSION = os.environ.get("MODEL_VERSION", "latest")
+
+
+def convert_to_raw_github_url(url):
+    """
+    Convert GitHub web page URLs to raw content URLs.
+    """
+    if 'github.com' in url and 'raw.githubusercontent.com' not in url:
+        url = url.replace('github.com', 'raw.githubusercontent.com')
+        url = url.replace('/blob/', '/')
+    return url
 
 
 def get_model_path():
@@ -17,7 +30,19 @@ def get_model_path():
     Path(MODEL_CACHE_DIR).mkdir(parents=True, exist_ok=True)
     
     # Use the model version in the filename
-    return os.path.join(MODEL_CACHE_DIR, f"model_{MODEL_VERSION}.pkl")
+    return os.path.join(MODEL_CACHE_DIR, f"model_{MODEL_VERSION}.joblib")
+
+
+def get_cv_path():
+    """
+    Get the path to the CountVectorizer file based on the MODEL_VERSION.
+    Creates the cache directory if it doesn't exist.
+    """
+    # Create cache directory if it doesn't exist
+    Path(CV_CACHE_DIR).mkdir(parents=True, exist_ok=True)
+    
+    # Use the model version in the filename
+    return os.path.join(CV_CACHE_DIR, f"cv_{MODEL_VERSION}.pkl")
 
 
 def download_model():
@@ -29,6 +54,9 @@ def download_model():
 
     if not url:
         raise ValueError("MODEL_URL environment variable is not set.")
+    
+    # Convert to raw GitHub URL if needed
+    url = convert_to_raw_github_url(url)
     
     model_path = get_model_path()
     
@@ -54,16 +82,61 @@ def download_model():
         raise RuntimeError(f"Failed to download model from {url}")
 
 
+def download_cv():
+    """
+    Download the CountVectorizer from a given URL and save it to the specified path.
+    Uses MODEL_VERSION to manage different versions of the CountVectorizer.
+    """
+    url = os.environ.get("CV_URL")
+
+    if not url:
+        raise ValueError("CV_URL environment variable is not set.")
+    
+    # Convert to raw GitHub URL if needed
+    url = convert_to_raw_github_url(url)
+    
+    cv_path = get_cv_path()
+    
+    # Check if the CountVectorizer already exists in cache
+    if os.path.exists(cv_path):
+        print(f"CountVectorizer version {MODEL_VERSION} already exists at {cv_path}. Using cached version.")
+        return cv_path
+    
+    # Download the CountVectorizer
+    print(f"Downloading CountVectorizer version {MODEL_VERSION} from {url}...")
+
+    # Check if the URL is valid
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        # Save to the cache location
+        with open(cv_path, "wb") as f:
+            f.write(response.content)
+        print(f"CountVectorizer downloaded and saved to {cv_path}")
+        return cv_path
+    else:
+        print(f"Failed to download CountVectorizer. Status code: {response.status_code}")
+        raise RuntimeError(f"Failed to download CountVectorizer from {url}")
+
+
 def load_model():
     """
-    Load the model from the specified path.
-    Downloads the model if it doesn't exist in the cache.
+    Load the model and CountVectorizer from the specified paths.
+    Downloads them if they don't exist in the cache.
+    
+    Returns:
+        tuple: (cv, model) - The loaded CountVectorizer and model objects
     """
-    # Download the model if needed and get the path
+    # Download the model and CountVectorizer if needed and get the paths
+    cv_path = download_cv()
     model_path = download_model()
+
+    print(f"Loading CountVectorizer from {cv_path}...")
+    cv = joblib.load(cv_path)
+    print(f"CountVectorizer version {MODEL_VERSION} loaded successfully.")
 
     print(f"Loading model from {model_path}...")
     model = joblib.load(model_path)
-
     print(f"Model version {MODEL_VERSION} loaded successfully.")
-    return model
+    
+    return cv, model

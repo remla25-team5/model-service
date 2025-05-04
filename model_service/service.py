@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 from model_utils import load_model
 from flasgger import Swagger, swag_from
 import os
-import pandas as pd
 
 from lib_ml import preprocess_element
 from lib_ml import __version__ as lib_ml_version
@@ -33,8 +32,11 @@ def predict():
     preprocessed_text = preprocess_element(text)
     transformed_corpus = cv.transform([preprocessed_text])
     
+    # Convert sparse matrix to dense array before prediction
+    transformed_corpus_dense = transformed_corpus.toarray()
+    
     # Make prediction
-    sentiment = True if model.predict(transformed_corpus)[0] == 1 else False
+    sentiment = True if model.predict(transformed_corpus_dense)[0] == 1 else False
     
     return jsonify({"text": text, 'sentiment': sentiment})
 

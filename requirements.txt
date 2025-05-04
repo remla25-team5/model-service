@@ -2,6 +2,5 @@ flask
 requests
 joblib
 pathlib
-pandas
 flasgger
 lib-ml @ git+https://github.com/remla25-team5/lib-ml.git@0.0.0
