@@ -4,7 +4,7 @@ from flasgger import Swagger, swag_from
 import os
 import pandas as pd
 
-from lib_ml import preprocessing
+from lib_ml import preprocess_element
 from lib_ml import __version__ as lib_ml_version
 
 app = Flask(__name__)
@@ -30,10 +30,8 @@ def predict():
     
     text = data['text']
 
-    # Convert text to the format required by the model (pandas DataFrame with a single column 'Review')
-    text_df = pd.DataFrame([text], columns=['Review'])
-    corpus = preprocessing(text_df)
-    transformed_corpus = cv.transform(corpus)
+    preprocessed_text = preprocess_element(text)
+    transformed_corpus = cv.transform([preprocessed_text])
     
     # Make prediction
     sentiment = True if model.predict(transformed_corpus)[0] == 1 else False
