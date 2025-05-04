@@ -2,7 +2,7 @@ summary: Predict sentiment of restaurant review
 description: >
   Returns the predicted sentiment of a restaurant review using the ML model.
 
-  A prediction of `1` indicates positive sentiment, and `0` indicates negative sentiment.
+  A prediction of True indicates positive sentiment, and False indicates negative sentiment.
 consumes:
   - application/json
 produces:
