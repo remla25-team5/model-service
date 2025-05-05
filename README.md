@@ -43,3 +43,19 @@ docker run -p 5000:5000 \
   -v /host/path/to/cv-cache:/app/cv-cache \
   ghcr.io/remla25-team5/model-service:latest
 ```
+
+## Example .env File
+
+The `.env` file should contain the following environment variables for the service to function properly:
+
+```
+MODEL_SERVICE_HOST=0.0.0.0
+MODEL_SERVICE_PORT=5000
+MODEL_CACHE_DIR=./model-cache
+CV_CACHE_DIR=./cv-cache
+MODEL_VERSION=0.0.1
+MODEL_URL=https://github.com/remla25-team5/model-training/releases/download/{MODEL_VERSION}/c2_Classifier_Sentiment_Model.joblib
+CV_URL=https://github.com/remla25-team5/model-training/releases/download/{MODEL_VERSION}/c1_BoW_Sentiment_Model.pkl
+```
+
+Note that `{MODEL_VERSION}` in the URLs will be automatically replaced with the value of `MODEL_VERSION`. You can modify these variables according to your specific deployment requirements.
