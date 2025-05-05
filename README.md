@@ -38,9 +38,7 @@ For production deployments, it's recommended to mount persistent volumes to the 
 
 ```bash
 docker run -p 5000:5000 \
-  -e MODEL_URL=https://github.com/remla25-team5/model-training/releases/download/0.0.1/c2_Classifier_Sentiment_Model.joblib \
-  -e CV_URL=https://github.com/remla25-team5/model-training/releases/download/0.0.1/c1_BoW_Sentiment_Model.pkl \
-  -e MODEL_VERSION=0.0.1 \
+  --env-file=.env \
   -v /host/path/to/model-cache:/app/model-cache \
   -v /host/path/to/cv-cache:/app/cv-cache \
   ghcr.io/remla25-team5/model-service:latest
