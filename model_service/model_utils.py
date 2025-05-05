@@ -11,16 +11,6 @@ CV_CACHE_DIR = os.environ.get("CV_CACHE_DIR", os.path.join(BASE_DIR, "cv-cache")
 MODEL_VERSION = os.environ.get("MODEL_VERSION", "latest")
 
 
-def convert_to_raw_github_url(url):
-    """
-    Convert GitHub web page URLs to raw content URLs.
-    """
-    if 'github.com' in url and 'raw.githubusercontent.com' not in url:
-        url = url.replace('github.com', 'raw.githubusercontent.com')
-        url = url.replace('/blob/', '/')
-    return url
-
-
 def get_model_path():
     """
     Get the path to the model file based on the MODEL_VERSION.
@@ -55,9 +45,6 @@ def download_model():
     if not url:
         raise ValueError("MODEL_URL environment variable is not set.")
     
-    # Convert to raw GitHub URL if needed
-    url = convert_to_raw_github_url(url)
-    
     model_path = get_model_path()
     
     # Check if the model already exists in cache
@@ -91,9 +78,6 @@ def download_cv():
 
     if not url:
         raise ValueError("CV_URL environment variable is not set.")
-    
-    # Convert to raw GitHub URL if needed
-    url = convert_to_raw_github_url(url)
     
     cv_path = get_cv_path()
     
