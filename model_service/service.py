@@ -7,8 +7,10 @@ import os
 from lib_ml import preprocess_element
 from lib_ml import __version__ as lib_ml_version
 
-# Load environment variables from .env file
-load_dotenv()
+# Load environment variables from .env file only if not running in a container
+# This helps in local development while allowing Docker to use its own env variables
+if os.environ.get("DOCKER_CONTAINER") != "true":
+    load_dotenv()
 
 app = Flask(__name__)
 swagger = Swagger(app)

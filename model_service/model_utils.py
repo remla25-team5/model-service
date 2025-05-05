@@ -8,7 +8,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 MODEL_CACHE_DIR = os.environ.get("MODEL_CACHE_DIR", os.path.join(BASE_DIR, "model-cache"))
 CV_CACHE_DIR = os.environ.get("CV_CACHE_DIR", os.path.join(BASE_DIR, "cv-cache"))
-MODEL_VERSION = os.environ.get("MODEL_VERSION", "latest")
+MODEL_VERSION = os.environ.get("MODEL_VERSION", "0.0.1")
 
 
 def get_model_path():
