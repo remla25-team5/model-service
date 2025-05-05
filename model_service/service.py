@@ -13,8 +13,8 @@ swagger = Swagger(app)
 cv, model = load_model()
 
 # Get host and port from environment variables or use defaults
-HOST = os.environ.get("MODEL_SERVICE_HOST", "0.0.0.0")
-PORT = int(os.environ.get("MODEL_SERVICE_PORT", 5000))
+HOST = os.environ.get("MODEL_SERVICE_HOST")
+PORT = int(os.environ.get("MODEL_SERVICE_PORT"))
 
 @app.route('/predict', methods=['POST'])
 @swag_from('docs/predict.yml')
