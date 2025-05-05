@@ -40,7 +40,7 @@ def download_model():
     Download the model from a given URL and save it to the specified path.
     Uses MODEL_VERSION to manage different versions of the model.
     """
-    url = os.environ.get("MODEL_URL")
+    url = os.environ.get("MODEL_URL").format(MODEL_VERSION=MODEL_VERSION)
 
     if not url:
         raise ValueError("MODEL_URL environment variable is not set.")
@@ -74,7 +74,7 @@ def download_cv():
     Download the CountVectorizer from a given URL and save it to the specified path.
     Uses MODEL_VERSION to manage different versions of the CountVectorizer.
     """
-    url = os.environ.get("CV_URL")
+    url = os.environ.get("CV_URL").format(MODEL_VERSION=MODEL_VERSION)
 
     if not url:
         raise ValueError("CV_URL environment variable is not set.")
