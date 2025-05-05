@@ -4,4 +4,5 @@ joblib
 pathlib
 flasgger
 scikit-learn
+python-dotenv
 lib-ml @ https://github.com/remla25-team5/lib-ml/releases/download/0.0.1/lib_ml-0.0.1-py3-none-any.whl
