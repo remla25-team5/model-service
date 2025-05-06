@@ -32,16 +32,23 @@ jobs:
         echo "pre_version=$pre_version" >> $GITHUB_ENV
         echo "version_major=$MAJOR" >> $GITHUB_ENV
         echo "version_minor=$MINOR" >> $GITHUB_ENV
+        IMG="ghcr.io/${{github.repository}}"
+        IMG=${IMG@L} # lower case the image
+        echo "IMG=$IMG" >> $GITHUB_ENV
     - run: |
         git tag "${{ env.pre_version }}"
         git push origin "${{ env.pre_version }}"
-    - run: |
-        IMG="ghcr.io/${{github.repository}}"
-        IMG=${IMG@L} # lower case the image
-        docker build \
-        --tag $IMG:${{ env.pre_version }} \
-        --tag $IMG:${{ env.version_major }}.${{ env.version_minor }}.latest \
-        --tag $IMG:${{ env.version_major }}.latest \
-        --tag $IMG:latest \
-        .
-        docker push --all-tags $IMG
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    - name: Build and push
+      uses: docker/build-push-action@v6
+      with:
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: |
+          ${{ env.IMG }}:${{ env.pre_version }}
+          ${{ env.IMG }}:${{ env.version_major }}.${{ env.version_minor }}.latest
+          ${{ env.IMG }}:${{ env.version_major }}.latest
+          ${{ env.IMG }}:latest
