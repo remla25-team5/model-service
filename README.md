@@ -13,7 +13,7 @@ The service can be configured using the following environment variables:
 - `MODEL_CACHE_DIR`: Optional. Directory where models will be cached. Defaults to local "model-cache" directory.
 - `CV_CACHE_DIR`: Optional. Directory where CountVectorizers will be cached. Defaults to local "cv-cache" directory.
 - `MODEL_SERVICE_HOST`: Optional. Host address for the service. Defaults to "0.0.0.0".
-- `MODEL_SERVICE_PORT`: Optional. Port for the service. Defaults to 5000.
+- `MODEL_SERVICE_PORT_NUMBER`: Optional. Port for the service. Defaults to 5000.
 
 ## API Endpoints
 
@@ -50,7 +50,7 @@ The `.env` file should contain the following environment variables for the servi
 
 ```
 MODEL_SERVICE_HOST=0.0.0.0
-MODEL_SERVICE_PORT=5000
+MODEL_SERVICE_PORT_NUMBER=5000
 MODEL_CACHE_DIR=./model-cache
 CV_CACHE_DIR=./cv-cache
 MODEL_VERSION=0.0.1
