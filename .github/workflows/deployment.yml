@@ -1,4 +1,4 @@
-name: Lib-ml Deployment
+name: Model-service Deployment
 
 on:
   workflow_dispatch:

@@ -1,4 +1,4 @@
-name: Lib-ml Delivery
+name: Model-service Delivery
 
 on:
   push:
