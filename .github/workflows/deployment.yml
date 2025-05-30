@@ -1,17 +1,17 @@
 name: Lib-ml Deployment
 
-on: push
-  # workflow_dispatch:
-  #   inputs:
-  #     bump_level:
-  #       description: 'Specify the type of version bump for the new release.'
-  #       required: false
-  #       type: choice 
-  #       options:   
-  #         - patch
-  #         - minor
-  #         - major
-  #       default: 'patch' 
+on:
+  workflow_dispatch:
+    inputs:
+      bump_level:
+        description: 'Specify the type of version bump for the new release.'
+        required: false
+        type: choice 
+        options:   
+          - patch
+          - minor
+          - major
+        default: 'patch' 
 
 jobs:
   delivery:
@@ -51,8 +51,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release_branches: main
           pre_release_branches: 'NONE'
-          # default_bump: ${{ inputs.bump_level }}fdsf
-          default_bump: patch
+          default_bump: ${{ inputs.bump_level }}
           tag_prefix: v
 
       - name: Set up QEMU
@@ -94,7 +93,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release_branches: 'NONE'
-          # pre_release_branches: main
+          pre_release_branches: main
           default_prerelease_bump: prerelease
           append_to_pre_release_tag: pre
           tag_prefix: v
