@@ -35,8 +35,7 @@ jobs:
         id: prep_image_name
         run: |
           img_path="${{ env.INITIAL_IMG_PATH }}"
-          echo "IMG=${img_path,,}" >> $GITHUB_ENV # ,, is bash lowercase operator
-          echo "Prepared image path: ${img_path,,}"
+          echo "IMG=${img_path,,}" >> $GITHUB_ENV 
 
       - name: login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -88,7 +87,7 @@ jobs:
             New release: ${{ env.NEW_TAG }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Add new pre release
         uses: mathieudutour/github-tag-action@v6.2
         with:
