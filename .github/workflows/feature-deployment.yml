@@ -1,10 +1,10 @@
 name: Feature Branch Build & Push (v2 Image)
 
-on:
+on: push
   # push:
   #   branches:
   #     - 'feature/**'  
-  workflow_dispatch: 
+  # workflow_dispatch: 
 
 env:
   BASE_IMAGE_PATH: ghcr.io/${{ github.repository }}
