@@ -59,3 +59,74 @@ CV_URL=https://github.com/remla25-team5/model-training/releases/download/{MODEL_
 ```
 
 Note that `{MODEL_VERSION}` in the URLs will be automatically replaced with the value of `MODEL_VERSION`. You can modify these variables according to your specific deployment requirements.
+
+## Running Locally
+
+To run the service on your local machine for development or testing:
+
+1.  **Prerequisites:**
+    *   Python (3.8+ recommended)
+    *   pip (Python package installer)
+
+2.  **Clone the repository (if you haven't already):**
+    ```bash
+    git clone <your-repository-url>
+    cd <repository-folder-name>
+    ```
+
+3.  **Create and activate a virtual environment:**
+    This isolates project dependencies.
+    ```bash
+    python -m venv .venv
+    ```
+    Activate it:
+    *   **Windows (Command Prompt):**
+        ```cmd
+        .venv\Scripts\activate.bat
+        ```
+    *   **Windows (PowerShell):**
+        ```powershell
+        .venv\Scripts\Activate.ps1
+        ```
+    *   **macOS/Linux (bash/zsh):**
+        ```bash
+        source .venv/bin/activate
+        ```
+
+4.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+5.  **Create your `.env` file:**
+    Copy the example `.env` content from above (or create your own) in the project root directory.
+
+6.  **Run the service:**
+    There are two common ways:
+
+    *   **Option 1: Using the Flask CLI (Recommended)**
+        Set the `FLASK_APP` environment variable to point to your application instance.
+        *   **Windows (Command Prompt):**
+            ```cmd
+            set FLASK_APP=model_service.service
+            flask run
+            ```
+        *   **Windows (PowerShell):**
+            ```powershell
+            $env:FLASK_APP="model_service.service"
+            flask run
+            ```
+        *   **macOS/Linux (bash/zsh):**
+            ```bash
+            export FLASK_APP=model_service.service
+            flask run
+            ```
+        The `flask run` command will typically start the server on `http://127.0.0.1:5000/` or use the `MODEL_SERVICE_HOST` and `MODEL_SERVICE_PORT_NUMBER` from your `.env` file.
+
+    *   **Option 2: Directly executing the Python script**
+        This requires your `model_service/service.py` file to have an `if __name__ == '__main__': app.run(...)` block.
+        ```bash
+        python model_service/service.py
+        ```
+
+    The service should now be running and accessible, typically at `http://localhost:5000` (or the host/port configured in your `.env` file and used by the application).
