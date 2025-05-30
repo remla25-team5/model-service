@@ -1,17 +1,17 @@
 name: Lib-ml Deployment
 
-on: 
-  workflow_dispatch:
-    inputs:
-      bump_level:
-        description: 'Specify the type of version bump for the new release.'
-        required: false
-        type: choice 
-        options:   
-          - patch
-          - minor
-          - major
-        default: 'patch' 
+on: push
+  # workflow_dispatch:
+  #   inputs:
+  #     bump_level:
+  #       description: 'Specify the type of version bump for the new release.'
+  #       required: false
+  #       type: choice 
+  #       options:   
+  #         - patch
+  #         - minor
+  #         - major
+  #       default: 'patch' 
 
 jobs:
   delivery:
