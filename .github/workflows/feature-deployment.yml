@@ -1,0 +1,63 @@
+name: Feature Branch Build & Push (v2 Image)
+
+on:
+  # push:
+  #   branches:
+  #     - 'feature/**'  
+  workflow_dispatch: 
+
+env:
+  BASE_IMAGE_PATH: ghcr.io/${{ github.repository }}
+  FEATURE_TAG_SUFFIX: "v2" 
+                              
+jobs:
+  build_and_push_feature_v2_tag:
+    name: Build and Push Feature Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read   
+      packages: write   
+      attestations: write 
+      id-token: write 
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Prepare Feature Image Name and Tag
+        id: prep_image_details
+        run: |
+          img_path="${{ env.BASE_IMAGE_PATH }}"
+
+          FULL_IMAGE_NAME="${img_path,,}"
+          echo "FULL_IMAGE_NAME=${FULL_IMAGE_NAME}" >> $GITHUB_ENV
+
+          BRANCH_NAME="${{ github.ref_name }}"
+
+          SANITIZED_BRANCH_NAME=$(echo "$BRANCH_NAME" | sed 's|/|-|g' | tr -cd '[:alnum:]-_')
+          
+          FEATURE_SPECIFIC_TAG="${SANITIZED_BRANCH_NAME}-${FEATURE_TAG_SUFFIX}"
+          echo "FEATURE_SPECIFIC_TAG=${FEATURE_SPECIFIC_TAG}" >> $GITHUB_ENV
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Feature Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64 
+          push: true
+          tags: |
+            ${{ env.FULL_IMAGE_NAME }}.${{ env.FEATURE_SPECIFIC_TAG }}
+            ${{ env.FULL_IMAGE_NAME }}.${{ env.FEATURE_TAG_SUFFIX }}.latest 

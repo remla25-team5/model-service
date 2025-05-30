@@ -1,0 +1,100 @@
+name: Lib-ml Deployment
+
+on: 
+  workflow_dispatch:
+    inputs:
+      bump_level:
+        description: 'Specify the type of version bump for the new release.'
+        required: false
+        type: choice 
+        options:   
+          - patch
+          - minor
+          - major
+        default: 'patch' 
+
+jobs:
+  delivery:
+    name: Deployment
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      attestations: write
+      id-token: write
+    env: 
+      INITIAL_IMG_PATH: ghcr.io/${{ github.repository }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare image name (lowercase)
+        id: prep_image_name
+        run: |
+          img_path="${{ env.INITIAL_IMG_PATH }}"
+          echo "IMG=${img_path,,}" >> $GITHUB_ENV # ,, is bash lowercase operator
+          echo "Prepared image path: ${img_path,,}"
+
+      - name: login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Bump stable version and push tag
+        id: bump_version
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          release_branches: main
+          pre_release_branches: 'NONE'
+          default_bump: ${{ inputs.bump_level }}
+          tag_prefix: v
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Extract version parts
+        id: extract_versions 
+        run: |
+          VERSION=${{ steps.bump_version.outputs.new_version }}
+          echo "FULL_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "MAJOR_VERSION=$(echo $VERSION | cut -d. -f1)" >> $GITHUB_ENV
+          echo "MINOR_VERSION=$(echo $VERSION | cut -d. -f2)" >> $GITHUB_ENV
+          echo "NEW_TAG=${{ steps.bump_version.outputs.new_tag }}" >> $GITHUB_ENV
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ env.IMG }}:${{ env.NEW_TAG }}
+            ${{ env.IMG }}:v${{ env.MAJOR_VERSION }}.${{ env.MINOR_VERSION }}.latest
+            ${{ env.IMG }}:${{ env.MAJOR_VERSION }}.latest
+            ${{ env.IMG }}:latest
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2 
+        with:
+          tag_name: ${{ env.NEW_TAG }}
+          name: Release ${{ env.NEW_TAG }}
+          body: |
+            New release: ${{ env.NEW_TAG }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Add new pre release
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          release_branches: 'NONE'
+          pre_release_branches: main
+          default_prerelease_bump: prerelease
+          append_to_pre_release_tag: pre
+          tag_prefix: v
