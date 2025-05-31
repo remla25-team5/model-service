@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from model_utils import load_model
+from .model_utils import load_model
 from flasgger import Swagger, swag_from
 from dotenv import load_dotenv
 import os
@@ -42,9 +42,16 @@ def predict():
     transformed_corpus_dense = transformed_corpus.toarray()
     
     # Make prediction
-    sentiment = True if model.predict(transformed_corpus_dense)[0] == 1 else False
+    prediction_int = model.predict(transformed_corpus_dense)[0]
+    sentiment = True if prediction_int == 1 else False
+
+    probabilities = model.predict_proba(transformed_corpus_dense)[0]
+    if sentiment:
+        confidence = probabilities[1] 
+    else: 
+        confidence = probabilities[0]
     
-    return jsonify({"text": text, 'sentiment': sentiment})
+    return jsonify({"text": text, 'sentiment': sentiment, 'confidence': confidence})
 
 
 @app.route('/version', methods=['GET'])
