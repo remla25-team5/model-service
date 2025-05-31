@@ -1,0 +1,55 @@
+name: Feature Branch Deployment (V2)
+
+on: 
+  workflow_dispatch:  
+    feature_branch_name:
+        description: 'The exact name of the feature branch to deploy.'
+        required: true
+        type: string 
+                              
+jobs:
+  build_and_push_feature_v2_tag:
+    name: Build and Push Feature Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read   
+      packages: write   
+      attestations: write 
+      id-token: write 
+    env: 
+      INITIAL_IMG_PATH: ghcr.io/${{ github.repository }}
+      FEATURE_TAG_SUFFIX: "v2" 
+
+    steps:
+      - name: Checkout specified feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.feature_branch_name }}
+
+      - name: Prepare Feature Image Name and Tag
+        id: prep_image_details
+        run: |
+          img_path="${{ env.INITIAL_IMG_PATH }}"
+          echo "IMG=${img_path,,}" >> $GITHUB_ENV 
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Feature Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64 
+          push: true
+          tags: |
+            ${{ env.IMG }}:${{ env.FEATURE_TAG_SUFFIX }}.latest 
