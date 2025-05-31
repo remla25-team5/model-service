@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from .model_utils import load_model
+from model_utils import load_model
 from flasgger import Swagger, swag_from
 from dotenv import load_dotenv
 import os
