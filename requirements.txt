@@ -5,4 +5,4 @@ pathlib
 flasgger
 python-dotenv
 scikit-learn==1.4.2
-lib-ml @ https://github.com/remla25-team5/lib-ml/releases/download/0.0.1/lib_ml-0.0.1-py3-none-any.whl
+lib-ml @ https://github.com/remla25-team5/lib-ml/releases/download/v0.1.1/lib_ml-0.1.1-py3-none-any.whl
